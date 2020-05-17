@@ -22,25 +22,32 @@ void MainWindow::on_pushButton_clicked()
     LexicalAnalyzer *lexem = new LexicalAnalyzer(parent(),textProgram);
     QString result = lexem->getLexems();
     ui->lexem_out->setText(result);
-    uploadTables(lexem);
+    QMap <QString, QString> allLexems=uploadTables(lexem);
 
     ReversePolishNotation *RPN = new ReversePolishNotation(parent(),result);
     QString rpn = RPN->makeRPN();
     ui->reverse_polish_natation->setText(rpn);
+
+    Translation *translate = new Translation(parent(),rpn, &allLexems);
+    ui->pascal_text->setText(translate->getResult());
 }
 
-void MainWindow::uploadTables(LexicalAnalyzer *lexem)
+QMap <QString, QString> MainWindow::uploadTables(LexicalAnalyzer *lexem)
 {
+
+    QMap <QString, QString> allLexems;
+
     //Загрузка зарезервированных слов
 
     QMap <QString, QString> serviceWords =  lexem->getServiceWords();
     int rowCount = 0;
-//    serviceWords=reverseMap(serviceWords);
-    QMap <QString,QString>::iterator i;
 
+    QMap <QString,QString>::iterator i;
+    allLexems = serviceWords;
     ui->tableServiceWords->setRowCount(serviceWords.size());
     ui->tableServiceWords->setColumnCount(2);
     for (i = serviceWords.begin();i!=serviceWords.end();i++){
+
         ui->tableServiceWords->setItem(rowCount,1,new QTableWidgetItem(i.key()));
         ui->tableServiceWords->setItem(rowCount,0,new QTableWidgetItem(i.value()));
         rowCount++;
@@ -60,12 +67,14 @@ void MainWindow::uploadTables(LexicalAnalyzer *lexem)
     ui->tableOperators->setRowCount(operators.size()+multiOperators.size());
     ui->tableOperators->setColumnCount(2);
     for (j = operators.begin();j!=operators.end();j++){
+        allLexems.insert(j.key(),j.value());
         ui->tableOperators->setItem(rowCount,1,new QTableWidgetItem(j.key()));
         ui->tableOperators->setItem(rowCount,0,new QTableWidgetItem(j.value()));
         rowCount++;
     }
 
     for (i = multiOperators.begin();i!=multiOperators.end();i++){
+        allLexems.insert(i.key(),i.value());
         ui->tableOperators->setItem(rowCount,1,new QTableWidgetItem(i.key()));
         ui->tableOperators->setItem(rowCount,0,new QTableWidgetItem(i.value()));
         rowCount++;
@@ -82,6 +91,7 @@ void MainWindow::uploadTables(LexicalAnalyzer *lexem)
     ui->tableSeparators->setRowCount(separators.size());
     ui->tableSeparators->setColumnCount(2);
     for (j = separators.begin();j!=separators.end();j++){
+        allLexems.insert(j.key(),j.value());
         ui->tableSeparators->setItem(rowCount,1,new QTableWidgetItem(j.key()));
         ui->tableSeparators->setItem(rowCount,0,new QTableWidgetItem(j.value()));
         rowCount++;
@@ -99,6 +109,7 @@ void MainWindow::uploadTables(LexicalAnalyzer *lexem)
     ui->tableStringConsts->setRowCount(stringConsts.size());
     ui->tableStringConsts->setColumnCount(2);
     for (i = stringConsts.begin();i!=stringConsts.end();i++){
+        allLexems.insert(i.key(),i.value());
         ui->tableStringConsts->setItem(rowCount,1,new QTableWidgetItem(i.key()));
         ui->tableStringConsts->setItem(rowCount,0,new QTableWidgetItem(i.value()));
         rowCount++;
@@ -116,6 +127,7 @@ void MainWindow::uploadTables(LexicalAnalyzer *lexem)
     ui->tableDigitConsts->setRowCount(digitConsts.size());
     ui->tableDigitConsts->setColumnCount(2);
     for (i = digitConsts.begin();i!=digitConsts.end();i++){
+        allLexems.insert(i.key(),i.value());
         ui->tableDigitConsts->setItem(rowCount,1,new QTableWidgetItem(i.key()));
         ui->tableDigitConsts->setItem(rowCount,0,new QTableWidgetItem(i.value()));
         rowCount++;
@@ -134,6 +146,7 @@ void MainWindow::uploadTables(LexicalAnalyzer *lexem)
     ui->tableIdentifaers->setRowCount(identifaers.size());
     ui->tableIdentifaers->setColumnCount(2);
     for (i = identifaers.begin();i!=identifaers.end();i++){
+        allLexems.insert(i.key(),i.value());
         ui->tableIdentifaers->setItem(rowCount,1,new QTableWidgetItem(i.key()));
         ui->tableIdentifaers->setItem(rowCount,0,new QTableWidgetItem(i.value()));
         rowCount++;
@@ -142,6 +155,8 @@ void MainWindow::uploadTables(LexicalAnalyzer *lexem)
     ui->tableIdentifaers->setHorizontalHeaderItem(0,new QTableWidgetItem("Код"));
     ui->tableIdentifaers->setHorizontalHeaderItem(1,new QTableWidgetItem("Слово"));
 //    ui->tableIdentifaers->resizeColumnsToContents();
+
+    return allLexems;
 }
 
 

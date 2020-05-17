@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include "lexicalanalyzer.h"
 #include "reversepolishnotation.h"
+#include "translation.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -20,7 +21,7 @@ public:
 
 private slots:
     void on_pushButton_clicked();
-    void uploadTables(LexicalAnalyzer *lexem);
+    QMap <QString, QString> uploadTables(LexicalAnalyzer *lexem);
 private:
     Ui::MainWindow *ui;
 };

@@ -4,16 +4,19 @@
 ReversePolishNotation::ReversePolishNotation(QObject *parent, const QString textProgram) : QObject(parent)
 {
     createPriorityTable();
+    stack = *new QStack <QString>;
+
     this->textProgram=textProgram;
     QList<QString> temp = textProgram.split("\n");
     for(int i=0;i<temp.length();i++){
         data.append(temp[i].split(" "));
     }
     data.removeAll("");
-    foreach (QString i, data) {
 
-        qDebug() << i;
-    }
+//    foreach (QString i, data) {
+
+//        qDebug() << i;
+//    }
 
     state_0(0);
     qDebug() << "ОПЗ = " << buffer;
@@ -69,7 +72,7 @@ void ReversePolishNotation::createPriorityTable()
 
 void ReversePolishNotation::state_0(int currentLexId)
 {
-    qDebug() << currentLexId ;
+//    qDebug() << currentLexId ;
     if (currentLexId >= data.length()){
             state_z();
     } else if (data[currentLexId][0]=="I") {    // если идентификатор, то просто пишем
@@ -85,7 +88,6 @@ void ReversePolishNotation::state_0(int currentLexId)
                 || (stack.contains("W1") && data[currentLexId]=="R3")) {  // if
         if (stack.contains("W1")) {
             state_2(currentLexId);
-//            countOfArray++;
         } else {
             stack.push(data[currentLexId]);
             state_0(++currentLexId);
@@ -94,7 +96,7 @@ void ReversePolishNotation::state_0(int currentLexId)
                || (stack.contains("W12") && data[currentLexId]=="R3")) {  // while
        if (stack.contains("W12")) {
            state_5(currentLexId);
-//           countOfArray++;
+
        } else {
            buffer+= "Ц2: ";
            stack.push(data[currentLexId]);
@@ -137,12 +139,12 @@ void ReversePolishNotation::state_2(int currentLexId)
         buffer += "M1 УПЛ ";
         state_0(++currentLexId);
     } else if (data[currentLexId]=="R3") {
-        if (!stack.contains("W2") && currentLexId!=data.length()-1) {
-            if (data[currentLexId+1]=="W2") {
+        if (!stack.contains("W2") && currentLexId!=data.length()-1 && data[currentLexId+1]=="W2") {
+//            if (data[currentLexId+1]=="W2") {
                 buffer += "M2 БП M1: ";
                 stack.push(data[currentLexId+1]);
                 state_0(currentLexId+3);
-            }
+//            }
         } else if (stack.contains("W2")) {
             buffer += "M2: ";
             while(!stack.isEmpty() && stack.top()!="W1"){
@@ -171,8 +173,13 @@ void ReversePolishNotation::state_3(int currentLexId) // разделители
 
         if (stack.contains(isTypeNow)) {
             if (isTypeNow == "W5") {
-                buffer+= stack.pop() + " "  + isTypeNow + " ";
-                if (!stack.isEmpty())
+                if (stack.top()=="W5") {
+                    buffer+= stack.pop() + " ";
+                } else {
+                    buffer+= stack.pop() + " " + isTypeNow + " ";
+
+                }
+                if (!stack.isEmpty() && stack.top()!="W1")
                     stack.pop();
                 countId=0;
                 isTypeNow="";
@@ -264,7 +271,7 @@ void ReversePolishNotation::state_3(int currentLexId) // разделители
 void ReversePolishNotation::state_4(int currentLexId)
 {
     if (data[currentLexId]=="W3" || data[currentLexId]=="W4" || data[currentLexId]=="W6"
-            || data[currentLexId]=="W10" || data[currentLexId]=="W13" || data[currentLexId]=="W9" || data[currentLexId]=="W5") {
+            || data[currentLexId]=="W10" || data[currentLexId]=="W13" || data[currentLexId]=="W9" || data[currentLexId]=="W5" || data[currentLexId]=="W8") {
         isTypeNow = data[currentLexId];
         countId++;
         stack.push(data[currentLexId]);
@@ -286,7 +293,7 @@ void ReversePolishNotation::state_5(int currentLexId)
         }
         if (!stack.isEmpty())
             stack.pop();
-        buffer+= "Ц2 БП Ц1:";
+        buffer+= "Ц2 БП Ц1: ";
 
         state_0(++currentLexId);
     }
@@ -301,9 +308,9 @@ void ReversePolishNotation::state_z()
 {
     qDebug() << "END";
 
-    while(!stack.isEmpty()) {
-        buffer += stack.pop() + " ";
-    }
+//    while(!stack.isEmpty()) {
+//        buffer += stack.pop() + " ";
+//    }
 }
 
 
